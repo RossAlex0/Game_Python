@@ -9,12 +9,15 @@ from switch import Switch
 class Player(Entity):
     def __init__(self, keylistener: KeyListener, screen: Screen, x: int, y: int):
         super().__init__(keylistener, screen, x, y)
+        self.current_image_index = None
+        self.in_pokeball_mode = False
         self.pokedollars: int = 0
         self.on_bike: bool = False
         self.is_wheeling: bool = False
         self.life: int = 40
         self.spritesheet_bike: pygame.image = pygame.image.load("../assets/sprite/hero_01_red_m_cycle_roll.png")
         self.spritesheet_whelling: pygame.image = pygame.image.load("../assets/sprite/hero_01_red_m_cycle_wheel.png")
+        self.spritesheet_poke = pygame.image.load("../assets/sprite/hero_01_red_m_pokecenter.png")
 
         self.switchs: list[Switch] | None = None
         self.collisions: list[pygame.Rect] | None = None
@@ -81,6 +84,17 @@ class Player(Entity):
             self.switch_bike()
         if self.keylistener.key_pressed(pygame.K_a) and self.on_bike:
             self.switch_wheeling()
+        if self.keylistener.key_pressed(pygame.K_e) and not self.on_bike:
+            if self.in_pokeball_mode:
+                self.switch_walk()
+            else:
+                self.switch_watch_pokeball()
+
+    def switch_walk(self):
+        self.speed = 1
+        self.in_pokeball_mode = False
+        self.all_images = self.get_all_images(self.spritesheet)
+        self.keylistener.remove_key(pygame.K_e)
 
     def switch_wheeling(self):
         if self.on_bike and not self.is_wheeling:
@@ -102,3 +116,19 @@ class Player(Entity):
             self.on_bike = False
             self.all_images = self.get_all_images(self.spritesheet)
         self.keylistener.remove_key(pygame.K_b)
+
+    def switch_watch_pokeball(self):
+        if not self.on_bike:
+            self.speed = 0
+            all_images_dict = self.get_all_images(self.spritesheet_poke)
+            self.in_pokeball_mode = True
+            if 'right' in all_images_dict and all_images_dict['right']:
+                self.all_images = {'right': [all_images_dict['right'][3]]}
+                self.direction = 'right'
+                self.index_image = 0
+
+        else:
+            self.in_pokeball_mode = False
+            self.all_images = self.get_all_images(self.spritesheet)
+
+        self.keylistener.remove_key(pygame.K_e)
