@@ -29,7 +29,7 @@ class Map:
         self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=14)
 
         if switch.name.split("_")[0] == "map":
-            self.map_layer.zoom = 3
+            self.map_layer.zoom = 2.75
         else:
             self.map_layer.zoom = 3
 
