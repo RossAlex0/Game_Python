@@ -28,6 +28,7 @@ class Entity(pygame.sprite.Sprite):
 
         self.speed: int = 1
 
+
     def update(self) -> None:
         self.animation_sprite()
         self.move()

@@ -10,8 +10,11 @@ class Player(Entity):
     def __init__(self, keylistener: KeyListener, screen: Screen, x: int, y: int):
         super().__init__(keylistener, screen, x, y)
         self.pokedollars: int = 0
-
+        self.on_bike: bool = False
+        self.is_wheeling: bool = False
+        self.life: int = 40
         self.spritesheet_bike: pygame.image = pygame.image.load("../assets/sprite/hero_01_red_m_cycle_roll.png")
+        self.spritesheet_whelling: pygame.image = pygame.image.load("../assets/sprite/hero_01_red_m_cycle_wheel.png")
 
         self.switchs: list[Switch] | None = None
         self.collisions: list[pygame.Rect] | None = None
@@ -76,12 +79,26 @@ class Player(Entity):
     def check_input(self):
         if self.keylistener.key_pressed(pygame.K_b):
             self.switch_bike()
+        if self.keylistener.key_pressed(pygame.K_a) and self.on_bike:
+            self.switch_wheeling()
 
-    def switch_bike(self, deactive=False):
-        if self.speed == 1 and not deactive:
+    def switch_wheeling(self):
+        if self.on_bike and not self.is_wheeling:
+            self.speed = 4
+            self.is_wheeling = True
+            self.all_images = self.get_all_images(self.spritesheet_whelling)
+        else:
+            self.is_wheeling = False
+            self.all_images = self.get_all_images(self.spritesheet_bike)
+        self.keylistener.remove_key(pygame.K_a)
+
+    def switch_bike(self, desactive=False):
+        if not self.on_bike and not desactive:
+            self.on_bike = True
             self.speed = 4
             self.all_images = self.get_all_images(self.spritesheet_bike)
         else:
             self.speed = 1
+            self.on_bike = False
             self.all_images = self.get_all_images(self.spritesheet)
         self.keylistener.remove_key(pygame.K_b)
